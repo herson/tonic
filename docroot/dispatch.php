@@ -2,6 +2,7 @@
 
 // load Tonic library
 require_once '../lib/tonic.php';
+require_once '../lib/Pimple.php';
 
 // load examples
 require_once '../examples/examples.php';
