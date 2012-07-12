@@ -1,28 +1,23 @@
 <?php
-
-// load Tonic
 require_once '../src/Tonic/Autoloader.php';
+require_once '../lib/Pimple.php';
 
-$config = array(
-    'load' => array('../*.php', '../src/Tyrell/*.php'), // load example resources
-    #'mount' => array('Tyrell' => '/nexus'), // mount in example resources at URL /nexus
-    #'cache' => new Tonic\MetadataCache('/tmp/tonic.cache') // use the metadata cache
-);
+// set up the container
+$container = new Pimple();
+$container['dsn'] = 'mysql://root:root@localhost/tonic';
+$container['database'] = function ($c) {
+    return new DB($c['dsn']);
+};
+$container['dataStore'] = function ($c) {
+    return new DataStore($c['database']);
+};
 
-$app = new Tonic\Application($config);
-
-#echo $app;
-
+$app = new Tonic\Application();
 $request = new Tonic\Request();
-
-#echo $request;
-
 $resource = $app->getResource($request);
 
-#echo $resource;
+// make the container available to the resource before executing it
+$resource->container = $container;
 
 $response = $resource->exec();
-
-#echo $response;
-
 $response->output();
